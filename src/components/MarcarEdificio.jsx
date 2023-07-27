@@ -16,6 +16,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import useDepartamentos from '../hooks/useDepartamentos';
 import { useState } from 'react';
 import useDepartamentosUpdate from '../hooks/useDepartamentosUpdate';
+import Mapa from './Mapa';
 
 export default function MarcarEdificio() {
   const { id } = useParams();
@@ -44,7 +45,8 @@ export default function MarcarEdificio() {
       sx={{
         backgroundColor: '#F2F2F2',
         width: '100%',
-        height: '100vh',
+        minHeight: '100vh',
+        height: '100%',
         paddingY: '2rem',
         paddingX: '1rem',
       }}
@@ -110,6 +112,14 @@ export default function MarcarEdificio() {
           Volver a los territorios
         </Typography>
       </Grid>
+      {edificio?.attributes?.Latitud && edificio?.attributes?.Longitud && (
+        <Mapa
+          lat={edificio?.attributes?.Latitud}
+          lng={edificio?.attributes?.Longitud}
+          direccion={edificio?.attributes?.Direccion}
+        />
+      )}
+
       {edificio?.attributes?.Notas && (
         <Grid item xs={12} sx={{ marginTop: '2rem' }}>
           <Typography
@@ -151,7 +161,6 @@ export default function MarcarEdificio() {
               width: 150,
               flex: 1,
               valueFormatter: (params) => {
-                console.log(params);
                 return params.value
                   ? dayjs(params.value).format('DD/MM/YYYY HH:mm')
                   : 'No hay registro';
@@ -165,6 +174,8 @@ export default function MarcarEdificio() {
           }}
           sx={{
             marginTop: '2rem',
+            marginBottom: '2rem',
+            backgroundColor: 'white',
           }}
         />
 
@@ -186,6 +197,7 @@ export default function MarcarEdificio() {
                 cursor: 'pointer',
                 backgroundColor: '#2F4C49',
               },
+              marginBottom: '2rem',
             }}
           >
             Guardar cambios
