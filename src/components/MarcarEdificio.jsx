@@ -49,8 +49,7 @@ export default function MarcarEdificio() {
       sx={{
         backgroundColor: '#F2F2F2',
         width: '100%',
-        minHeight: '100vh',
-        height: '100%',
+        height: '100vh',
         paddingY: '2rem',
         paddingX: '1rem',
       }}

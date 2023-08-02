@@ -38,15 +38,7 @@ export default function Territorios() {
         </Typography>
       </Grid>
       {isLoading && <LinearProgress color='inherit' />}
-      <Grid
-        item
-        container
-        xs={12}
-        sx={{
-          marginTop: '2rem',
-        }}
-        spacing={2}
-      >
+      <Grid item container xs={12} sx={{ paddingY: '2rem' }} spacing={2}>
         {territorios?.map((territorio) => (
           <Territorio key={territorio.id} {...territorio} />
         ))}
