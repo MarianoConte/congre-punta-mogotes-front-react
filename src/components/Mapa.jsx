@@ -1,10 +1,16 @@
 import React from 'react';
-import { GoogleMap, useLoadScript, MarkerF } from '@react-google-maps/api';
+import {
+  GoogleMap,
+  useLoadScript,
+  MarkerF,
+  KmlLayer,
+} from '@react-google-maps/api';
 import { Box, Grid, Typography } from '@mui/material';
 
 function Mapa({ lat, lng, direccion }) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: `${import.meta.env.VITE_MAPS_API_KEY}`,
+    libraries: ['places'],
   });
 
   if (!isLoaded) return <div>Loading...</div>;
@@ -21,6 +27,15 @@ function Mapa({ lat, lng, direccion }) {
         }}
         zoom={17}
       >
+        <KmlLayer
+          url={
+            'https://www.google.com/maps/d/u/2/kml?mid=1gPRIzjrb9FEW0tFRXL_pmgfBAcOC6-E' +
+            '&ver=' +
+            generateRandom()
+          }
+          options={{ preserveViewport: true }}
+        />
+
         <MarkerF position={{ lat, lng }} title={direccion}>
           <Box sx={{ backgroundColor: 'white', padding: '0.5rem' }}>
             <Typography variant='h3'>{direccion}</Typography>
@@ -29,6 +44,10 @@ function Mapa({ lat, lng, direccion }) {
       </GoogleMap>
     </Grid>
   );
+}
+
+function generateRandom() {
+  return Math.random() * 10000000000000000;
 }
 
 export default Mapa;
