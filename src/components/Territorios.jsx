@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material';
+import { Grid, LinearProgress, Typography } from '@mui/material';
 import Territorio from './Territorio';
 import useTerritorios from '../hooks/useTerritorios';
 
@@ -37,6 +37,7 @@ export default function Territorios() {
           Territorios de la Congregación Punta Mogotes
         </Typography>
       </Grid>
+      {isLoading && <LinearProgress color='inherit' />}
       <Grid
         item
         container

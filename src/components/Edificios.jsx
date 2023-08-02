@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material';
+import { Grid, LinearProgress, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router';
 import useTerritorio from '../hooks/useTerritorio';
@@ -46,6 +46,9 @@ export default function Territorio() {
           Territorio {territorio?.attributes?.Numero}
         </Typography>
       </Grid>
+      {(isLoadingTerritorio || isLoadingEdificios) && (
+        <LinearProgress color='inherit' />
+      )}
       <Grid sx={{ marginTop: '2rem' }} item xs={12} md={3}>
         <Typography
           sx={{
@@ -104,7 +107,7 @@ export default function Territorio() {
         >
           Edificios:
         </Typography>
-        <Grid item container xs={12} sx={{ marginTop: '1rem' }} spacing={2}>
+        <Grid item container xs={12} sx={{ paddingY: '2rem' }} spacing={2}>
           {edificios?.map((edificio) => (
             <Edificio key={edificio?.id} {...edificio} />
           ))}

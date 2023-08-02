@@ -3,7 +3,7 @@ import clienteAxios from '../../config/clienteAxios';
 
 const getDepartamentos = async (id) => {
   const { data } = await clienteAxios.get(
-    `/departamentos?filters[edificio][id][$eq]=${id}&pagination[pageSize]=100&sort=UltimaVisita`
+    `/departamentos?filters[edificio][id][$eq]=${id}&pagination[pageSize]=100&sort=UltimaVisita:desc`
   );
   return data;
 };

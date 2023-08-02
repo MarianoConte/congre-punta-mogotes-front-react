@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import clienteAxios from '../../config/clienteAxios';
 
 const getEdificio = async (id) => {
-  const { data } = await clienteAxios.get(`/edificios/${id}`);
+  const { data } = await clienteAxios.get(`/edificios/${id}?populate=*`);
   return data;
 };
 
