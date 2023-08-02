@@ -35,12 +35,6 @@ function Mapa({ lat, lng, direccion }) {
           }
           options={{ preserveViewport: true }}
         />
-
-        <MarkerF position={{ lat, lng }} title={direccion}>
-          <Box sx={{ backgroundColor: 'white', padding: '0.5rem' }}>
-            <Typography variant='h3'>{direccion}</Typography>
-          </Box>
-        </MarkerF>
       </GoogleMap>
     </Grid>
   );
