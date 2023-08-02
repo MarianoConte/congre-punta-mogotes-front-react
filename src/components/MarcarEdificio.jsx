@@ -53,6 +53,7 @@ export default function MarcarEdificio() {
         paddingY: '2rem',
         paddingX: '1rem',
       }}
+      container
     >
       <Dialog
         open={openDialog}
@@ -100,7 +101,7 @@ export default function MarcarEdificio() {
       {(isLoading || isLoadingDepartamentos) && (
         <LinearProgress color='inherit' />
       )}
-      <Grid sx={{ marginTop: '2rem' }} item xs={12} md={3}>
+      <Grid sx={{ marginTop: '2rem' }} item md={4} xs={12}>
         <Typography
           sx={{
             fontSize: '1.8rem',
@@ -165,7 +166,7 @@ export default function MarcarEdificio() {
         </Grid>
       )}
       {departamentos?.length > 0 && isSuccessDepartamentos && (
-        <Grid item xs={12} sx={{ marginTop: '2rem' }}>
+        <Grid item xs={12} sx={{ paddingY: '2rem' }}>
           <Typography variant='h3' sx={{ fontSize: '1.8rem' }}>
             Seleccione los departamentos que ha tocado en este edificio:
           </Typography>
@@ -202,8 +203,7 @@ export default function MarcarEdificio() {
               setDepartamentosSeleccionados(params);
             }}
             sx={{
-              marginTop: '2rem',
-              marginBottom: '2rem',
+              marginY: '2rem',
               backgroundColor: 'white',
             }}
           />

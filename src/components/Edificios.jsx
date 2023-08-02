@@ -49,7 +49,7 @@ export default function Territorio() {
       {(isLoadingTerritorio || isLoadingEdificios) && (
         <LinearProgress color='inherit' />
       )}
-      <Grid sx={{ marginTop: '2rem' }} item xs={12} md={3}>
+      <Grid sx={{ marginTop: '2rem' }} item xs={12} md={4}>
         <Typography
           sx={{
             fontSize: '1.8rem',
