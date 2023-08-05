@@ -25,7 +25,7 @@ function Mapa({ lat, lng, direccion }) {
           marginTop: '2rem',
           marginBottom: '2rem',
         }}
-        zoom={20}
+        zoom={18}
       >
         <KmlLayer
           url={
