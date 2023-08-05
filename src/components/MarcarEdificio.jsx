@@ -44,6 +44,9 @@ export default function MarcarEdificio() {
     });
   };
 
+  if (isLoading || isLoadingDepartamentos)
+    return <LinearProgress color='inherit' />;
+
   return (
     <Grid
       sx={{
@@ -95,12 +98,11 @@ export default function MarcarEdificio() {
             display: 'inline-block',
           }}
         >
+          Edificio N°{edificio?.attributes?.Numero} -{' '}
           {edificio?.attributes?.Direccion}
         </Typography>
       </Grid>
-      {(isLoading || isLoadingDepartamentos) && (
-        <LinearProgress color='inherit' />
-      )}
+
       <Grid sx={{ marginTop: '2rem' }} item md={4} xs={12}>
         <Typography
           sx={{
@@ -172,17 +174,11 @@ export default function MarcarEdificio() {
           </Typography>
           <DataGrid
             rows={
-              departamentos
-                ?.sort((a, b) => {
-                  // Pongo los que no tienen registro de ultima visita primeros
-                  if (!a.attributes.UltimaVisita) return -1;
-                  if (!b.attributes.UltimaVisita) return 1;
-                })
-                .map((departamento) => ({
-                  id: departamento.id,
-                  Departamento: departamento.attributes.Departamento,
-                  UltimaVisita: departamento.attributes.UltimaVisita,
-                })) || []
+              departamentos.map((departamento) => ({
+                id: departamento.id,
+                Departamento: departamento.attributes.Departamento,
+                UltimaVisita: departamento.attributes.UltimaVisita,
+              })) || []
             }
             columns={[
               {

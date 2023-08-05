@@ -5,6 +5,8 @@ import useTerritorios from '../hooks/useTerritorios';
 export default function Territorios() {
   const { data: territorios, isLoading } = useTerritorios();
 
+  if (isLoading) return <LinearProgress color='inherit' />;
+
   return (
     <Grid
       sx={{
@@ -37,11 +39,13 @@ export default function Territorios() {
           Territorios de la Congregación Punta Mogotes
         </Typography>
       </Grid>
-      {isLoading && <LinearProgress color='inherit' />}
+
       <Grid item container xs={12} sx={{ paddingY: '2rem' }} spacing={2}>
-        {territorios?.map((territorio) => (
-          <Territorio key={territorio.id} {...territorio} />
-        ))}
+        {territorios
+          ?.sort((a, b) => a.attributes.Numero - b.attributes.Numero)
+          .map((territorio) => (
+            <Territorio key={territorio.id} {...territorio} />
+          ))}
       </Grid>
     </Grid>
   );

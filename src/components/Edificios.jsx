@@ -13,6 +13,9 @@ export default function Territorio() {
     useTerritorio(id);
   const { data: edificios, isLoading: isLoadingEdificios } = useEdificios(id);
 
+  if (isLoadingTerritorio || isLoadingEdificios)
+    return <LinearProgress color='inherit' />;
+
   return (
     <Grid
       container
@@ -46,9 +49,7 @@ export default function Territorio() {
           Territorio {territorio?.attributes?.Numero}
         </Typography>
       </Grid>
-      {(isLoadingTerritorio || isLoadingEdificios) && (
-        <LinearProgress color='inherit' />
-      )}
+
       <Grid sx={{ marginTop: '2rem' }} item xs={12} md={4}>
         <Typography
           sx={{
