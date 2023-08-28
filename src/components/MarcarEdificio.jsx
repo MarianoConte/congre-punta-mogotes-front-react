@@ -213,7 +213,10 @@ export default function MarcarEdificio() {
 
       {departamentos?.length > 0 && isSuccessDepartamentos && (
         <Grid item xs={12} sx={{ paddingY: '2rem' }}>
-          <Typography variant='h3' sx={{ fontSize: '1.8rem' }}>
+          <Typography
+            variant='h3'
+            sx={{ fontSize: '1.8rem', marginBottom: '1rem' }}
+          >
             Seleccione los departamentos que ha tocado en este edificio:
           </Typography>
           <DataGrid
