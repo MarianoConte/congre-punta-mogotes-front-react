@@ -2,7 +2,6 @@ import {
   Button,
   Dialog,
   DialogActions,
-  DialogContentText,
   DialogTitle,
   Grid,
   LinearProgress,
@@ -10,14 +9,15 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
-
 import { useNavigate, useParams } from 'react-router';
-import useEdificio from '../hooks/useEdficio';
+import useEdificio from '../hooks/useEdificio';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SaveIcon from '@mui/icons-material/Save';
 import useDepartamentos from '../hooks/useDepartamentos';
 import { useState } from 'react';
 import useDepartamentosUpdate from '../hooks/useDepartamentosUpdate';
 import Mapa from './Mapa';
+import ReactRouterPrompt from 'react-router-prompt';
 
 export default function MarcarEdificio() {
   const { id } = useParams();
@@ -78,6 +78,23 @@ export default function MarcarEdificio() {
           <Button onClick={handleSubmit}>Aceptar</Button>
         </DialogActions>
       </Dialog>
+
+      <ReactRouterPrompt
+        when={departamentosSeleccionados.length > 0 && !openDialog}
+      >
+        {({ isActive, onConfirm, onCancel }) => (
+          <Dialog open={isActive} onClose={onCancel}>
+            <DialogTitle>
+              No ha guardado los cambios realizados. Por favor, confirme si
+              desea salir sin guardar.
+            </DialogTitle>
+            <DialogActions>
+              <Button onClick={onCancel}>Cancelar</Button>
+              <Button onClick={onConfirm}>Aceptar</Button>
+            </DialogActions>
+          </Dialog>
+        )}
+      </ReactRouterPrompt>
       <Grid
         item
         xs={12}
@@ -126,13 +143,6 @@ export default function MarcarEdificio() {
           Volver a la lista de edificios
         </Typography>
       </Grid>
-      {edificio?.attributes?.Latitud && edificio?.attributes?.Longitud && (
-        <Mapa
-          lat={edificio?.attributes?.Latitud}
-          lng={edificio?.attributes?.Longitud}
-          direccion={edificio?.attributes?.Direccion}
-        />
-      )}
 
       {edificio?.attributes?.Notas && (
         <Grid item xs={12} sx={{ marginTop: '2rem' }}>
@@ -167,6 +177,40 @@ export default function MarcarEdificio() {
           </Typography>
         </Grid>
       )}
+
+      {departamentosSeleccionados.length > 0 && (
+        <Button
+          variant='contained'
+          type='submit'
+          onClick={() => setOpenDialog(true)}
+          fullWidth
+          sx={{
+            textAlign: 'center',
+            marginTop: '2rem',
+            fontSize: '1.8rem',
+            color: 'white',
+            paddingY: '0.9rem',
+            paddingX: '0.9rem',
+            backgroundColor: '#426B69',
+            '&:hover': {
+              cursor: 'pointer',
+              backgroundColor: '#2F4C49',
+            },
+          }}
+        >
+          <SaveIcon
+            sx={{
+              fontSize: '1.8rem',
+              verticalAlign: 'middle',
+              marginRight: '16px',
+            }}
+          />{' '}
+          Guardar cambios
+        </Button>
+      )}
+
+      {}
+
       {departamentos?.length > 0 && isSuccessDepartamentos && (
         <Grid item xs={12} sx={{ paddingY: '2rem' }}>
           <Typography variant='h3' sx={{ fontSize: '1.8rem' }}>
@@ -174,11 +218,18 @@ export default function MarcarEdificio() {
           </Typography>
           <DataGrid
             rows={
-              departamentos.map((departamento) => ({
-                id: departamento.id,
-                Departamento: departamento.attributes.Departamento,
-                UltimaVisita: departamento.attributes.UltimaVisita,
-              })) || []
+              departamentos
+                //Aquellos que su UltimaVisita sea null van primeros
+                ?.sort((a, b) => {
+                  if (a.attributes.UltimaVisita === null) return -1;
+                  if (b.attributes.UltimaVisita === null) return 1;
+                  return 0;
+                })
+                ?.map((departamento) => ({
+                  id: departamento.id,
+                  Departamento: departamento.attributes.Departamento,
+                  UltimaVisita: departamento.attributes.UltimaVisita,
+                })) || []
             }
             columns={[
               {
@@ -210,29 +261,12 @@ export default function MarcarEdificio() {
             }}
           />
 
-          {departamentosSeleccionados.length > 0 && (
-            <Button
-              variant='contained'
-              type='submit'
-              onClick={() => setOpenDialog(true)}
-              fullWidth
-              sx={{
-                textAlign: 'center',
-                marginTop: '2rem',
-                fontSize: '1.8rem',
-                color: 'white',
-                paddingY: '0.9rem',
-                paddingX: '0.9rem',
-                backgroundColor: '#426B69',
-                '&:hover': {
-                  cursor: 'pointer',
-                  backgroundColor: '#2F4C49',
-                },
-                marginBottom: '2rem',
-              }}
-            >
-              Guardar cambios
-            </Button>
+          {edificio?.attributes?.Latitud && edificio?.attributes?.Longitud && (
+            <Mapa
+              lat={edificio?.attributes?.Latitud}
+              lng={edificio?.attributes?.Longitud}
+              direccion={edificio?.attributes?.Direccion}
+            />
           )}
         </Grid>
       )}
