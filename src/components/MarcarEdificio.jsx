@@ -256,7 +256,6 @@ export default function MarcarEdificio() {
               setDepartamentosSeleccionados(params);
             }}
             sx={{
-              marginY: '2rem',
               backgroundColor: 'white',
             }}
           />

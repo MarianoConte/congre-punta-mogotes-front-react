@@ -22,7 +22,7 @@ function Mapa({ lat, lng, direccion }) {
         mapContainerStyle={{
           width: '100%',
           height: '300px',
-          marginTop: '2rem',
+          marginTop: '1rem',
           marginBottom: '2rem',
         }}
         zoom={18}
