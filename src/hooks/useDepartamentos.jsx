@@ -16,9 +16,13 @@ export default function useDepartamentos(id) {
       refetchOnWindowFocus: false,
       select: (data) =>
         data.data?.sort((a, b) => {
+          // Sort by last visit with null first
           if (a.attributes.UltimaVisita === null) return -1;
           if (b.attributes.UltimaVisita === null) return 1;
-          return 0;
+          return (
+            new Date(a.attributes.UltimaVisita) -
+            new Date(b.attributes.UltimaVisita)
+          );
         }),
     }
   );
