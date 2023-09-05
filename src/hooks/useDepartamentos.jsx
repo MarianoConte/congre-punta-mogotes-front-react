@@ -14,7 +14,12 @@ export default function useDepartamentos(id) {
     () => getDepartamentos(id),
     {
       refetchOnWindowFocus: false,
-      select: (data) => data.data,
+      select: (data) =>
+        data.data?.sort((a, b) => {
+          if (a.attributes.UltimaVisita === null) return -1;
+          if (b.attributes.UltimaVisita === null) return 1;
+          return 0;
+        }),
     }
   );
 
