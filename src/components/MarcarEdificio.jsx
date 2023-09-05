@@ -14,7 +14,7 @@ import useEdificio from '../hooks/useEdificio';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import useDepartamentos from '../hooks/useDepartamentos';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useDepartamentosUpdate from '../hooks/useDepartamentosUpdate';
 import Mapa from './Mapa';
 import ReactRouterPrompt from 'react-router-prompt';
@@ -44,7 +44,7 @@ export default function MarcarEdificio() {
     });
   };
 
-  const orderedDepartamentos = React.useMemo(
+  const orderedDepartamentos = useMemo(
     () =>
       departamentos?.sort((a, b) => {
         //Pongo los que están en null primero
