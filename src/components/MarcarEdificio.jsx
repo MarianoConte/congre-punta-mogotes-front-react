@@ -221,18 +221,11 @@ export default function MarcarEdificio() {
           </Typography>
           <DataGrid
             rows={
-              departamentos
-                //Aquellos que su UltimaVisita sea null van primeros
-                ?.sort((a, b) => {
-                  if (a.attributes.UltimaVisita === null) return -1;
-                  if (b.attributes.UltimaVisita === null) return 1;
-                  return 0;
-                })
-                ?.map((departamento) => ({
-                  id: departamento.id,
-                  Departamento: departamento.attributes.Departamento,
-                  UltimaVisita: departamento.attributes.UltimaVisita,
-                })) || []
+              departamentos?.map((departamento) => ({
+                id: departamento.id,
+                Departamento: departamento.attributes.Departamento,
+                UltimaVisita: departamento.attributes.UltimaVisita,
+              })) || []
             }
             columns={[
               {
