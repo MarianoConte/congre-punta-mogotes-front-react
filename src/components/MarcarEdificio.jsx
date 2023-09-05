@@ -44,6 +44,26 @@ export default function MarcarEdificio() {
     });
   };
 
+  const orderedDepartamentos = React.useMemo(
+    () =>
+      departamentos?.sort((a, b) => {
+        //Pongo los que están en null primero
+        if (
+          a.attributes.UltimaVisita === null &&
+          b.attributes.UltimaVisita !== null
+        ) {
+          return -1;
+        }
+        if (
+          a.attributes.UltimaVisita !== null &&
+          b.attributes.UltimaVisita === null
+        ) {
+          return 1;
+        }
+      }),
+    [departamentos]
+  );
+
   if (isLoading || isLoadingDepartamentos)
     return <LinearProgress color='inherit' />;
 
@@ -221,7 +241,7 @@ export default function MarcarEdificio() {
           </Typography>
           <DataGrid
             rows={
-              departamentos?.map((departamento) => ({
+              orderedDepartamentos?.map((departamento) => ({
                 id: departamento.id,
                 Departamento: departamento.attributes.Departamento,
                 UltimaVisita: departamento.attributes.UltimaVisita,
