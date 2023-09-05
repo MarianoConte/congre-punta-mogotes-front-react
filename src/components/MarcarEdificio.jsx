@@ -267,7 +267,6 @@ export default function MarcarEdificio() {
             <Mapa
               lat={edificio?.attributes?.Latitud}
               lng={edificio?.attributes?.Longitud}
-              direccion={edificio?.attributes?.Direccion}
             />
           )}
         </Grid>

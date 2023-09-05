@@ -1,13 +1,8 @@
 import React from 'react';
-import {
-  GoogleMap,
-  useLoadScript,
-  MarkerF,
-  KmlLayer,
-} from '@react-google-maps/api';
-import { Box, Grid, Typography } from '@mui/material';
+import { GoogleMap, useLoadScript, KmlLayer } from '@react-google-maps/api';
+import { Grid } from '@mui/material';
 
-function Mapa({ lat, lng, direccion }) {
+function Mapa({ lat, lng }) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: `${import.meta.env.VITE_MAPS_API_KEY}`,
     libraries: ['places'],
