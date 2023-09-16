@@ -141,27 +141,34 @@ export default function MarcarEdificio() {
       </Grid>
 
       <Grid sx={{ marginTop: '2rem' }} item md={4} xs={12}>
-        <Typography
+        <Button
+          startIcon={
+            <ArrowBackIcon
+              sx={{ fontSize: '1.8rem', verticalAlign: 'middle' }}
+            />
+          }
           sx={{
             fontSize: '1.8rem',
-            color: 'white',
+            color: '#8BB174',
             paddingY: '0.9rem',
             paddingX: '0.9rem',
-            backgroundColor: '#8BB174',
             '&:hover': {
               cursor: 'pointer',
-              backgroundColor: '#729D58',
             },
+            border: '1px solid #8BB174',
+            borderRadius: '0px',
+            textTransform: 'none',
           }}
+          fullWidth
           onClick={() => {
             navigate(
               `/territorio/${edificio?.attributes?.territorio?.data?.id}`
             );
           }}
         >
-          <ArrowBackIcon sx={{ fontSize: '1.8rem', verticalAlign: 'middle' }} />{' '}
+          {' '}
           Volver a la lista de edificios
-        </Typography>
+        </Button>
       </Grid>
 
       {edificio?.attributes?.Notas && (
@@ -232,7 +239,7 @@ export default function MarcarEdificio() {
       {}
 
       {departamentos?.length > 0 && isSuccessDepartamentos && (
-        <Grid item xs={12} sx={{ paddingY: '2rem' }}>
+        <Grid item xs={12} sx={{ paddingY: '2rem', maxHeight: '800px' }}>
           <Typography
             variant='h3'
             sx={{ fontSize: '1.8rem', marginBottom: '1rem' }}

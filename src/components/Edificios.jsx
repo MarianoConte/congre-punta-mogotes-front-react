@@ -1,4 +1,4 @@
-import { Grid, LinearProgress, Typography } from '@mui/material';
+import { Button, Grid, LinearProgress, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router';
 import useTerritorio from '../hooks/useTerritorio';
@@ -40,7 +40,7 @@ export default function Territorio() {
         <Typography
           variant='h1'
           sx={{
-            fontSize: '2rem',
+            fontSize: '1.8rem',
             color: 'white',
             verticalAlign: 'middle',
             display: 'inline-block',
@@ -51,25 +51,32 @@ export default function Territorio() {
       </Grid>
 
       <Grid sx={{ marginTop: '2rem' }} item xs={12} md={4}>
-        <Typography
+        <Button
+          startIcon={
+            <ArrowBackIcon
+              sx={{ fontSize: '1.8rem', verticalAlign: 'middle' }}
+            />
+          }
           sx={{
             fontSize: '1.8rem',
-            color: 'white',
+            color: '#8BB174',
             paddingY: '0.9rem',
             paddingX: '0.9rem',
-            backgroundColor: '#8BB174',
             '&:hover': {
               cursor: 'pointer',
-              backgroundColor: '#729D58',
             },
+            border: '1px solid #8BB174',
+            borderRadius: '0px',
+            textTransform: 'none',
           }}
+          fullWidth
           onClick={() => {
             navigate('/');
           }}
         >
-          <ArrowBackIcon sx={{ fontSize: '1.8rem', verticalAlign: 'middle' }} />{' '}
+          {' '}
           Volver a los territorios
-        </Typography>
+        </Button>
       </Grid>
       {territorio?.attributes?.Notas && (
         <Grid item xs={12} sx={{ marginTop: '2rem' }}>
