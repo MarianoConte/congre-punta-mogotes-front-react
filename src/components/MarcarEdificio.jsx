@@ -239,7 +239,11 @@ export default function MarcarEdificio() {
       {}
 
       {departamentos?.length > 0 && isSuccessDepartamentos && (
-        <Grid item xs={12} sx={{ paddingY: '2rem', maxHeight: '800px' }}>
+        <Grid
+          item
+          xs={12}
+          sx={{ paddingY: '2rem', maxHeight: { xs: '60vh', md: 'none' } }}
+        >
           <Typography
             variant='h3'
             sx={{ fontSize: '1.8rem', marginBottom: '1rem' }}
