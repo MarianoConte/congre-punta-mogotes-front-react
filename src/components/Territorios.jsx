@@ -36,7 +36,9 @@ export default function Territorios() {
             display: 'inline-block',
           }}
         >
-          Territorios de la Congregación Punta Mogotes
+          {`Territorios de la Congregación ${
+            import.meta.env.VITE_NOMBRE_DE_LA_CONGRE
+          }`}
         </Typography>
       </Grid>
 
