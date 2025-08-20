@@ -164,11 +164,25 @@ export default function Territorio() {
         >
           Edificios:
         </Typography>
-        <Grid item container xs={12} sx={{ paddingY: '2rem' }} spacing={2}>
-          {edificios?.map((edificio) => (
-            <Edificio key={edificio?.id} {...edificio} />
-          ))}
-        </Grid>
+        {edificios && edificios.length > 0 ? (
+          <Grid item container xs={12} sx={{ paddingY: '2rem' }} spacing={2}>
+            {edificios.map((edificio) => (
+              <Edificio key={edificio?.id} {...edificio} />
+            ))}
+          </Grid>
+        ) : (
+          <Typography
+            variant='body1'
+            sx={{
+              fontSize: '1.2rem',
+              marginTop: '16px',
+              fontStyle: 'italic',
+              color: 'text.secondary',
+            }}
+          >
+            No hay edificios cargados en este territorio.
+          </Typography>
+        )}
       </Grid>
     </Grid>
   );
