@@ -3,6 +3,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router';
 import useTerritorio from '../hooks/useTerritorio';
 import useEdificios from '../hooks/useEdificios';
+import useNoVisitar from '../hooks/useNoVisitar';
 import Edificio from './Edificio';
 
 export default function Territorio() {
@@ -12,8 +13,10 @@ export default function Territorio() {
   const { data: territorio, isLoading: isLoadingTerritorio } =
     useTerritorio(id);
   const { data: edificios, isLoading: isLoadingEdificios } = useEdificios(id);
+  const { data: noVisitarList, isLoading: isLoadingNoVisitar } =
+    useNoVisitar(id);
 
-  if (isLoadingTerritorio || isLoadingEdificios)
+  if (isLoadingTerritorio || isLoadingEdificios || isLoadingNoVisitar)
     return <LinearProgress color='inherit' />;
 
   return (
@@ -99,6 +102,52 @@ export default function Territorio() {
           </Typography>
         </Grid>
       )}
+
+      {/* Sección No Visitar */}
+      <Grid item xs={12} sx={{ marginTop: '2rem' }}>
+        <Typography
+          variant='h3'
+          sx={{
+            fontSize: '1.8rem',
+          }}
+        >
+          No visitar:
+        </Typography>
+        {noVisitarList && noVisitarList.length > 0 ? (
+          <Grid item xs={12} sx={{ marginTop: '1rem' }}>
+            {[...noVisitarList]
+              .sort((a, b) =>
+                a?.attributes?.direccion?.localeCompare(
+                  b?.attributes?.direccion ?? '',
+                  'es',
+                  { sensitivity: 'base' }
+                )
+              )
+              .map((item) => (
+                <Typography
+                  key={item.id}
+                  variant='body1'
+                  sx={{ fontSize: '1.2rem', marginTop: '8px' }}
+                >
+                  🚫 {item?.attributes?.direccion}
+                </Typography>
+              ))}
+          </Grid>
+        ) : (
+          <Typography
+            variant='body1'
+            sx={{
+              fontSize: '1.2rem',
+              marginTop: '16px',
+              fontStyle: 'italic',
+              color: 'text.secondary',
+            }}
+          >
+            No hay direcciones marcadas como "No Visitar"
+          </Typography>
+        )}
+      </Grid>
+
       <Grid
         item
         xs={12}
