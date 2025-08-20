@@ -143,7 +143,7 @@ export default function Territorio() {
               color: 'text.secondary',
             }}
           >
-            No hay direcciones marcadas como "No Visitar"
+            No hay direcciones marcadas como "No visitar" en este territorio.
           </Typography>
         )}
       </Grid>
