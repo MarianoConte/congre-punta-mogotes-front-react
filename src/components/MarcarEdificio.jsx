@@ -16,7 +16,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import useDepartamentos from '../hooks/useDepartamentos';
 import { useMemo, useState } from 'react';
 import useDepartamentosUpdate from '../hooks/useDepartamentosUpdate';
-import Mapa from './Mapa';
 import ReactRouterPrompt from 'react-router-prompt';
 import Navbar from './Navbar';
 
@@ -271,12 +270,6 @@ export default function MarcarEdificio() {
             }}
           />
 
-          {edificio?.attributes?.Latitud && edificio?.attributes?.Longitud && (
-            <Mapa
-              lat={edificio?.attributes?.Latitud}
-              lng={edificio?.attributes?.Longitud}
-            />
-          )}
         </Grid>
       )}
     </Grid>
