@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import clienteAxios from '../../config/clienteAxios';
 
 const getTerritorios = async () => {
-  const { data } = await clienteAxios('/territorios?pagination[pageSize]=100');
+  const { data } = await clienteAxios('/territorios?populate=*&pagination[pageSize]=100');
   return data;
 };
 

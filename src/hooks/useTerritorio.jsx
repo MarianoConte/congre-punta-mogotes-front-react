@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import clienteAxios from '../../config/clienteAxios';
 
 const getTerritorio = async (id) => {
-  const { data } = await clienteAxios.get(`/territorios/${id}`);
+  const { data } = await clienteAxios.get(`/territorios/${id}?populate=*`);
   return data;
 };
 

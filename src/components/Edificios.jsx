@@ -5,6 +5,7 @@ import useTerritorio from '../hooks/useTerritorio';
 import useEdificios from '../hooks/useEdificios';
 import useNoVisitar from '../hooks/useNoVisitar';
 import Edificio from './Edificio';
+import Navbar from './Navbar';
 
 export default function Territorio() {
   const { id } = useParams();
@@ -20,40 +21,25 @@ export default function Territorio() {
     return <LinearProgress color='inherit' />;
 
   return (
-    <Grid
-      container
-      sx={{
-        backgroundColor: '#F2F2F2',
-        width: '100%',
-        height: '100vh',
-        paddingY: '2rem',
-        paddingX: '1rem',
-      }}
-    >
+    <>
+      <Navbar />
       <Grid
-        item
-        xs={12}
+        container
         sx={{
-          backgroundColor: '#8BB174',
-          height: '15vh',
-          lineHeight: '15vh',
-          textAlign: 'center',
+          backgroundColor: '#F2F2F2',
+          width: '100%',
+          minHeight: 'calc(100vh - 64px)',
+          paddingY: '2rem',
+          paddingX: '1rem',
         }}
       >
-        <Typography
-          variant='h1'
-          sx={{
-            fontSize: '1.8rem',
-            color: 'white',
-            verticalAlign: 'middle',
-            display: 'inline-block',
-          }}
-        >
-          Territorio {territorio?.attributes?.Numero}
-        </Typography>
-      </Grid>
+        <Grid item xs={12} sx={{ mb: 2 }}>
+          <Typography variant='h5' sx={{ color: '#426B69', fontWeight: 'bold' }}>
+            Territorio {territorio?.attributes?.Numero}
+          </Typography>
+        </Grid>
 
-      <Grid sx={{ marginTop: '2rem' }} item xs={12} md={4}>
+        <Grid sx={{ marginTop: '0' }} item xs={12} md={4}>
         <Button
           startIcon={
             <ArrowBackIcon
@@ -185,5 +171,6 @@ export default function Territorio() {
         )}
       </Grid>
     </Grid>
+    </>
   );
 }

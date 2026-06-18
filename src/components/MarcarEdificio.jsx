@@ -18,6 +18,7 @@ import { useMemo, useState } from 'react';
 import useDepartamentosUpdate from '../hooks/useDepartamentosUpdate';
 import Mapa from './Mapa';
 import ReactRouterPrompt from 'react-router-prompt';
+import Navbar from './Navbar';
 
 export default function MarcarEdificio() {
   const { id } = useParams();
@@ -68,11 +69,13 @@ export default function MarcarEdificio() {
     return <LinearProgress color='inherit' />;
 
   return (
+    <>
+    <Navbar />
     <Grid
       sx={{
         backgroundColor: '#F2F2F2',
         width: '100%',
-        height: '100vh',
+        minHeight: 'calc(100vh - 64px)',
         paddingY: '2rem',
         paddingX: '1rem',
       }}
@@ -115,32 +118,13 @@ export default function MarcarEdificio() {
           </Dialog>
         )}
       </ReactRouterPrompt>
-      <Grid
-        item
-        xs={12}
-        sx={{
-          backgroundColor: '#8BB174',
-          height: '15vh',
-          lineHeight: '15vh',
-          textAlign: 'center',
-          paddingX: '1rem',
-        }}
-      >
-        <Typography
-          variant='h1'
-          sx={{
-            fontSize: '2rem',
-            color: 'white',
-            verticalAlign: 'middle',
-            display: 'inline-block',
-          }}
-        >
-          Edificio N°{edificio?.attributes?.Numero} -{' '}
-          {edificio?.attributes?.Direccion}
+      <Grid item xs={12} sx={{ mb: 2 }}>
+        <Typography variant='h5' sx={{ color: '#426B69', fontWeight: 'bold' }}>
+          Edificio N°{edificio?.attributes?.Numero} — {edificio?.attributes?.Direccion}
         </Typography>
       </Grid>
 
-      <Grid sx={{ marginTop: '2rem' }} item md={4} xs={12}>
+      <Grid sx={{ marginTop: '0' }} item md={4} xs={12}>
         <Button
           startIcon={
             <ArrowBackIcon
@@ -296,5 +280,6 @@ export default function MarcarEdificio() {
         </Grid>
       )}
     </Grid>
+    </>
   );
 }
