@@ -34,8 +34,8 @@ function calcularEstadoTerritorio(salidas, manzanas) {
     }
   }
 
-  const manzanasPendientes = manzanas.filter((m) => !currentCycle.has(m));
-  const completo = manzanasPendientes.length === 0 && manzanas.length > 0;
+  const completo = currentCycle.size === 0 && lastCompletionDate !== null;
+  const manzanasPendientes = completo ? [] : manzanas.filter((m) => !currentCycle.has(m));
 
   const ultimaSalida = salidasOrdenadas[salidasOrdenadas.length - 1];
   const diasDesdeUltima = ultimaSalida
