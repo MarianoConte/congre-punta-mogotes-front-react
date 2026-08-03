@@ -76,7 +76,7 @@ export function construirLibroS13(ExcelJS, datos) {
     if (indice === 0) {
       hoja.getRow(filaNombres).getCell(1).value = datos.numero;
       hoja.getRow(filaNombres).getCell(2).value = formatearFecha(
-        datos.ultimaFechaCompletadoPrevia
+        datos.ultimaFechaCompletado
       );
     }
 

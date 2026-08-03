@@ -19,11 +19,13 @@ export function generarDatosS13({ numero, manzanas, salidas, anioServicio }) {
   const { desde, hasta } = rangoAnioServicio(anioServicio);
   const ciclos = calcularCiclos(salidas, manzanas);
 
-  const completadosPrevios = ciclos.filter(
-    (c) => c.completo && dayjs(c.fechaCompletado).valueOf() < desde.valueOf()
+  // La última vez que se completó el territorio hasta el cierre del año de servicio.
+  // No se limita a lo anterior al 1 de septiembre para que la celda no quede vacía
+  // cuando el territorio no tiene historial previo al año que se está imprimiendo.
+  const completados = ciclos.filter(
+    (c) => c.completo && dayjs(c.fechaCompletado).valueOf() <= hasta.valueOf()
   );
-  const ultimaFechaCompletadoPrevia =
-    completadosPrevios[completadosPrevios.length - 1]?.fechaCompletado ?? null;
+  const ultimaFechaCompletado = completados[completados.length - 1]?.fechaCompletado ?? null;
 
   const asignaciones = ciclos
     .filter((c) => {
@@ -49,7 +51,7 @@ export function generarDatosS13({ numero, manzanas, salidas, anioServicio }) {
   return {
     numero,
     anioServicio,
-    ultimaFechaCompletadoPrevia,
+    ultimaFechaCompletado,
     asignaciones,
     filas,
   };

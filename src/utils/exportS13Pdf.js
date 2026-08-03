@@ -118,7 +118,7 @@ export async function construirPdfS13(PDFDocument, StandardFonts, plantillaBytes
       indiceEnPagina === 0
         ? {
             numero: String(datos.numero),
-            ultimaFecha: formatearFecha(datos.ultimaFechaCompletadoPrevia),
+            ultimaFecha: formatearFecha(datos.ultimaFechaCompletado),
           }
         : null;
     escribirFila(pagina, fuente, indiceEnPagina, bloques, cabecera);
