@@ -2,57 +2,20 @@ import { Box, Button, Chip, Dialog, DialogContent, IconButton, LinearProgress, P
 import { DataGrid, esES } from '@mui/x-data-grid';
 import PrintIcon from '@mui/icons-material/Print';
 import CloseIcon from '@mui/icons-material/Close';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import GridOnIcon from '@mui/icons-material/GridOn';
 import dayjs from 'dayjs';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import useTerritorios from '../hooks/useTerritorios';
 import useSalidas from '../hooks/useSalidas';
+import { calcularEstadoTerritorio } from '../utils/ciclos';
+import DescargarS13Dialog from './DescargarS13Dialog';
 import Navbar from './Navbar';
 
 const BACKEND_BASE = import.meta.env.VITE_BACKEND_URL.replace('/api', '');
 
-function calcularEstadoTerritorio(salidas, manzanas) {
-  if (!manzanas || manzanas.length === 0) return null;
-
-  const salidasOrdenadas = [...salidas].sort(
-    (a, b) => new Date(a.attributes.Fecha) - new Date(b.attributes.Fecha)
-  );
-
-  let currentCycle = new Set();
-  let lastCompletionDate = null;
-  let lastCompletionConductor = null;
-
-  for (const salida of salidasOrdenadas) {
-    const manzanasSalida = salida.attributes.Manzanas ?? [];
-    manzanasSalida.forEach((m) => currentCycle.add(m));
-
-    const todasCubiertas = manzanas.every((m) => currentCycle.has(m));
-    if (todasCubiertas) {
-      lastCompletionDate = salida.attributes.Fecha;
-      lastCompletionConductor = salida.attributes.Conductor;
-      currentCycle = new Set();
-    }
-  }
-
-  const completo = currentCycle.size === 0 && lastCompletionDate !== null;
-  const manzanasPendientes = completo ? [] : manzanas.filter((m) => !currentCycle.has(m));
-
-  const ultimaSalida = salidasOrdenadas[salidasOrdenadas.length - 1];
-  const diasDesdeUltima = ultimaSalida
-    ? dayjs().diff(dayjs(ultimaSalida.attributes.Fecha), 'day')
-    : null;
-  const conductorUltima = ultimaSalida?.attributes?.Conductor ?? '-';
-
-  return {
-    fechaFinalizacion: lastCompletionDate,
-    conductor: completo ? lastCompletionConductor ?? conductorUltima : conductorUltima,
-    diasDesdeUltima,
-    estado: completo ? 'Completo' : 'Incompleto',
-    manzanasPendientes: completo ? [] : manzanasPendientes,
-  };
-}
-
-function buildColumns(onFotoClick) {
+function buildColumns(onFotoClick, onDescargar) {
   return [
   {
     field: 'foto',
@@ -71,7 +34,14 @@ function buildColumns(onFotoClick) {
         <Box sx={{ width: 60, height: 50, backgroundColor: '#e0e0e0', borderRadius: 1 }} />
       ),
   },
-  { field: 'numero', headerName: 'Nº', flex: 0.4, minWidth: 70 },
+  {
+    field: 'numero',
+    headerName: 'Nº',
+    flex: 0.4,
+    minWidth: 70,
+    // El Numero es string en Strapi: sin esto ordena 1, 11, 12, 2...
+    sortComparator: (a, b) => Number(a) - Number(b),
+  },
   {
     field: 'fechaFinalizacion',
     headerName: 'Fin de ciclo',
@@ -117,6 +87,34 @@ function buildColumns(onFotoClick) {
     flex: 1.2,
     minWidth: 160,
   },
+  {
+    field: 'descargar',
+    headerName: 'Descargar',
+    width: 120,
+    sortable: false,
+    filterable: false,
+    disableColumnMenu: true,
+    headerClassName: 'no-print',
+    cellClassName: 'no-print',
+    renderCell: (params) => (
+      <>
+        <IconButton
+          size='small'
+          title='Descargar S-13 en PDF'
+          onClick={() => onDescargar('pdf', params.row)}
+        >
+          <PictureAsPdfIcon sx={{ color: '#C62828' }} />
+        </IconButton>
+        <IconButton
+          size='small'
+          title='Descargar S-13 en Excel'
+          onClick={() => onDescargar('xlsx', params.row)}
+        >
+          <GridOnIcon sx={{ color: '#1D6F42' }} />
+        </IconButton>
+      </>
+    ),
+  },
 ];
 }
 
@@ -127,8 +125,17 @@ export default function TableroDeServicio() {
   const { data: territorios, isLoading: isLoadingTerritorios } = useTerritorios();
   const { data: salidas, isLoading: isLoadingSalidas } = useSalidas();
   const [modalFoto, setModalFoto] = useState(null);
+  const [descarga, setDescarga] = useState(null);
 
-  const columns = useMemo(() => buildColumns(setModalFoto), []);
+  const handleDescargar = useCallback(
+    (formato, row) => setDescarga({ formato, row }),
+    []
+  );
+
+  const columns = useMemo(
+    () => buildColumns(setModalFoto, handleDescargar),
+    [handleDescargar]
+  );
   const handlePrint = useReactToPrint({ contentRef: printRef });
 
   const rows = useMemo(() => {
@@ -153,6 +160,8 @@ export default function TableroDeServicio() {
             diasDesdeUltima: null,
             estado: 'Sin configurar',
             manzanasPendientes: '-',
+            manzanas,
+            salidas: salidasTerritorio,
           };
         }
 
@@ -170,6 +179,8 @@ export default function TableroDeServicio() {
             stats?.manzanasPendientes?.length > 0
               ? stats.manzanasPendientes.join(', ')
               : '-',
+          manzanas,
+          salidas: salidasTerritorio,
         };
       });
   }, [territorios, salidas]);
@@ -267,6 +278,22 @@ export default function TableroDeServicio() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Descarga de la planilla S-13 */}
+      <DescargarS13Dialog
+        open={!!descarga}
+        formato={descarga?.formato}
+        territorio={
+          descarga
+            ? {
+                numero: descarga.row.numero,
+                manzanas: descarga.row.manzanas,
+                salidas: descarga.row.salidas,
+              }
+            : null
+        }
+        onClose={() => setDescarga(null)}
+      />
     </>
   );
 }
