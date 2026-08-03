@@ -9,8 +9,19 @@ import { useReactToPrint } from 'react-to-print';
 import useSalidas from '../hooks/useSalidas';
 import Navbar from './Navbar';
 
+function numeroDeTerritorio(valor) {
+  return parseInt(String(valor).replace(/\D/g, ''), 10) || 0;
+}
+
 const columns = [
-  { field: 'territorio', headerName: 'Territorio', flex: 0.7, minWidth: 110 },
+  {
+    field: 'territorio',
+    headerName: 'Territorio',
+    flex: 0.7,
+    minWidth: 110,
+    // El valor es "Territorio 12": ordenado como texto quedaría 1, 11, 12, 2...
+    sortComparator: (a, b) => numeroDeTerritorio(a) - numeroDeTerritorio(b),
+  },
   {
     field: 'fecha',
     headerName: 'Fecha',
