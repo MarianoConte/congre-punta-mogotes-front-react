@@ -1,12 +1,10 @@
-import { Box, Button, Chip, Dialog, DialogContent, IconButton, LinearProgress, Paper, Typography } from '@mui/material';
+import { Box, Chip, Dialog, DialogContent, IconButton, LinearProgress, Paper, Typography } from '@mui/material';
 import { DataGrid, esES } from '@mui/x-data-grid';
-import PrintIcon from '@mui/icons-material/Print';
 import CloseIcon from '@mui/icons-material/Close';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import GridOnIcon from '@mui/icons-material/GridOn';
 import dayjs from 'dayjs';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { useReactToPrint } from 'react-to-print';
+import { useCallback, useMemo, useState } from 'react';
 import useTerritorios from '../hooks/useTerritorios';
 import useSalidas from '../hooks/useSalidas';
 import { calcularEstadoTerritorio } from '../utils/ciclos';
@@ -121,7 +119,6 @@ function buildColumns(onFotoClick, onDescargar) {
 const localeText = esES.components.MuiDataGrid.defaultProps.localeText;
 
 export default function TableroDeServicio() {
-  const printRef = useRef();
   const { data: territorios, isLoading: isLoadingTerritorios } = useTerritorios();
   const { data: salidas, isLoading: isLoadingSalidas } = useSalidas();
   const [modalFoto, setModalFoto] = useState(null);
@@ -136,7 +133,6 @@ export default function TableroDeServicio() {
     () => buildColumns(setModalFoto, handleDescargar),
     [handleDescargar]
   );
-  const handlePrint = useReactToPrint({ contentRef: printRef });
 
   const rows = useMemo(() => {
     if (!territorios || !salidas) return [];
@@ -206,52 +202,33 @@ export default function TableroDeServicio() {
           <Box sx={{ height: 10, backgroundColor: '#8BB174', borderRadius: '8px 8px 0 0' }} />
 
           <Box sx={{ p: 3 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                mb: 2,
-              }}
-            >
-              <Typography variant='h5' sx={{ fontWeight: 'bold', color: '#426B69' }}>
-                Tablero de Servicio
-              </Typography>
-              <Button
-                variant='outlined'
-                startIcon={<PrintIcon />}
-                onClick={handlePrint}
-                sx={{ borderColor: '#8BB174', color: '#8BB174' }}
-              >
-                Imprimir / PDF
-              </Button>
-            </Box>
+            <Typography variant='h5' sx={{ fontWeight: 'bold', color: '#426B69', mb: 2 }}>
+              Tablero de Servicio
+            </Typography>
 
-            <Box ref={printRef}>
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                rowHeight={60}
-                localeText={localeText}
-                autoHeight
-                initialState={{
-                  sorting: { sortModel: [{ field: 'diasDesdeUltima', sort: 'desc' }] },
-                  pagination: { paginationModel: { pageSize: 25 } },
-                }}
-                pageSizeOptions={[10, 25, 50, 100]}
-                sx={{
-                  backgroundColor: 'white',
-                  border: 'none',
-                  '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: '#f5f5f5',
-                    fontWeight: 'bold',
-                  },
-                  '& .MuiDataGrid-overlayWrapper': {
-                    minHeight: 200,
-                  },
-                }}
-              />
-            </Box>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              rowHeight={60}
+              localeText={localeText}
+              autoHeight
+              initialState={{
+                sorting: { sortModel: [{ field: 'diasDesdeUltima', sort: 'desc' }] },
+                pagination: { paginationModel: { pageSize: 25 } },
+              }}
+              pageSizeOptions={[10, 25, 50, 100]}
+              sx={{
+                backgroundColor: 'white',
+                border: 'none',
+                '& .MuiDataGrid-columnHeaders': {
+                  backgroundColor: '#f5f5f5',
+                  fontWeight: 'bold',
+                },
+                '& .MuiDataGrid-overlayWrapper': {
+                  minHeight: 200,
+                },
+              }}
+            />
           </Box>
         </Paper>
       </Box>
