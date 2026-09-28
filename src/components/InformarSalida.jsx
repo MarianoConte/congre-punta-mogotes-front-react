@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Checkbox,
@@ -30,7 +31,7 @@ import { useAuthContext } from '../context/AuthContext';
 import useTerritorios from '../hooks/useTerritorios';
 import useTerritorio from '../hooks/useTerritorio';
 import useCreateSalida from '../hooks/useCreateSalida';
-import useCreateNoVisitar from '../hooks/useCreateNoVisitar';
+import useNoVisitar from '../hooks/useNoVisitar';
 import useMessages from '../hooks/useMessages';
 import Navbar from './Navbar';
 
@@ -41,9 +42,13 @@ export default function InformarSalida() {
   const { user } = useAuthContext();
   const { showError } = useMessages();
 
-  const { data: territorios, isLoading: isLoadingTerritorios } = useTerritorios();
+  const {
+    data: territorios,
+    isLoading: isLoadingTerritorios,
+    isError: isErrorTerritorios,
+    refetch: refetchTerritorios,
+  } = useTerritorios();
   const createSalida = useCreateSalida();
-  const createNoVisitar = useCreateNoVisitar();
 
   const [territorioId, setTerritorioId] = useState('');
   const [fecha, setFecha] = useState(dayjs());
@@ -54,6 +59,12 @@ export default function InformarSalida() {
 
   const { data: territorioDetalle, isLoading: isLoadingDetalle } =
     useTerritorio(territorioId || null);
+
+  const { data: noVisitarExistentes } = useNoVisitar(territorioId || null);
+
+  const territoriosOrdenados = [...(territorios ?? [])].sort(
+    (a, b) => a.attributes.Numero - b.attributes.Numero
+  );
 
   const manzanas = territorioDetalle?.attributes?.Manzanas ?? [];
   const fotoUrl = territorioDetalle?.attributes?.Foto?.data?.attributes?.url;
@@ -76,6 +87,19 @@ export default function InformarSalida() {
       showError('Seleccione un territorio primero');
       return;
     }
+
+    const clave = val.toLowerCase();
+    const yaEnLaLista = noVisitarAgregados.some((d) => d.toLowerCase() === clave);
+    const yaEnElTerritorio = (noVisitarExistentes ?? []).some(
+      (n) => String(n.attributes?.direccion ?? '').trim().toLowerCase() === clave
+    );
+
+    if (yaEnLaLista || yaEnElTerritorio) {
+      showError('Esa dirección ya está en la lista de "No visitar"');
+      setNoVisitarInput('');
+      return;
+    }
+
     setNoVisitarAgregados((prev) => [...prev, val]);
     setNoVisitarInput('');
   };
@@ -99,12 +123,9 @@ export default function InformarSalida() {
         territorio: Number(territorioId),
       },
       {
-        onSuccess: () => {
-          noVisitarAgregados.forEach((direccion) => {
-            createNoVisitar.mutate({ direccion, territorioId: Number(territorioId) });
-          });
-          navigate('/');
-        },
+        // Recién navegamos cuando el backend confirmó que guardó todo; si algo
+        // falla el usuario se queda en el formulario con los datos cargados.
+        onSuccess: () => navigate('/'),
       }
     );
   };
@@ -141,24 +162,44 @@ export default function InformarSalida() {
             </Typography>
 
             {/* Territorio */}
-            <FormControl fullWidth sx={{ mb: 3 }}>
-              <InputLabel id='territorio-label'>Territorio</InputLabel>
-              <Select
-                labelId='territorio-label'
-                label='Territorio'
-                value={territorioId}
-                onChange={handleTerritorioChange}
-                disabled={isLoadingTerritorios}
+            {isErrorTerritorios ? (
+              <Alert
+                severity='error'
+                sx={{ mb: 3 }}
+                action={
+                  <Button color='inherit' size='small' onClick={() => refetchTerritorios()}>
+                    Reintentar
+                  </Button>
+                }
               >
-                {territorios
-                  ?.sort((a, b) => a.attributes.Numero - b.attributes.Numero)
-                  .map((t) => (
-                    <MenuItem key={t.id} value={String(t.id)}>
-                      Territorio {t.attributes.Numero}
+                No se pudieron cargar los territorios
+              </Alert>
+            ) : (
+              <FormControl fullWidth sx={{ mb: 3 }}>
+                <InputLabel id='territorio-label'>Territorio</InputLabel>
+                <Select
+                  labelId='territorio-label'
+                  label='Territorio'
+                  value={territorioId}
+                  onChange={handleTerritorioChange}
+                  disabled={isLoadingTerritorios}
+                >
+                  {territoriosOrdenados.length === 0 ? (
+                    <MenuItem disabled value=''>
+                      {isLoadingTerritorios
+                        ? 'Cargando territorios…'
+                        : 'No hay territorios disponibles'}
                     </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
+                  ) : (
+                    territoriosOrdenados.map((t) => (
+                      <MenuItem key={t.id} value={String(t.id)}>
+                        Territorio {t.attributes.Numero}
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+              </FormControl>
+            )}
 
             {/* Fecha y hora */}
             <DateTimePicker
