@@ -1,19 +1,36 @@
-import { Box, Button, LinearProgress, Paper, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  LinearProgress,
+  Paper,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { DataGrid, esES } from '@mui/x-data-grid';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import PrintIcon from '@mui/icons-material/Print';
 import ClearIcon from '@mui/icons-material/Clear';
+import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from 'dayjs';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import useSalidas from '../hooks/useSalidas';
+import useDeleteSalida from '../hooks/useDeleteSalida';
 import Navbar from './Navbar';
 
 function numeroDeTerritorio(valor) {
   return parseInt(String(valor).replace(/\D/g, ''), 10) || 0;
 }
 
-const columns = [
+function buildColumns(onEliminar) {
+  return [
   {
     field: 'territorio',
     headerName: 'Territorio',
@@ -33,7 +50,27 @@ const columns = [
   { field: 'conductor', headerName: 'Conductor', flex: 1.2, minWidth: 140 },
   { field: 'manzanas', headerName: 'Manzanas', flex: 0.8, minWidth: 120 },
   { field: 'noVisitar', headerName: 'No Visitar nuevos', flex: 1.4, minWidth: 180 },
-];
+  {
+    field: 'acciones',
+    headerName: '',
+    width: 70,
+    sortable: false,
+    filterable: false,
+    disableColumnMenu: true,
+    renderCell: (params) => (
+      <Tooltip title='Eliminar salida'>
+        <IconButton
+          size='small'
+          onClick={() => onEliminar(params.row)}
+          sx={{ color: 'error.main' }}
+        >
+          <DeleteIcon fontSize='small' />
+        </IconButton>
+      </Tooltip>
+    ),
+  },
+  ];
+}
 
 const localeText = esES.components.MuiDataGrid.defaultProps.localeText;
 
@@ -49,6 +86,19 @@ export default function HistorialDeSalidas() {
   };
 
   const { data: salidas, isLoading } = useSalidas(filtros);
+  const eliminarSalida = useDeleteSalida();
+
+  // Salida que el usuario pidió borrar y está esperando confirmación.
+  const [salidaAEliminar, setSalidaAEliminar] = useState(null);
+
+  const columns = useMemo(() => buildColumns(setSalidaAEliminar), []);
+
+  const confirmarEliminacion = () => {
+    if (!salidaAEliminar) return;
+    eliminarSalida.mutate(salidaAEliminar.id, {
+      onSuccess: () => setSalidaAEliminar(null),
+    });
+  };
 
   const handlePrint = useReactToPrint({ contentRef: printRef });
 
@@ -153,12 +203,62 @@ export default function HistorialDeSalidas() {
                   '& .MuiDataGrid-overlayWrapper': {
                     minHeight: 200,
                   },
+                  // El botón de borrar no tiene sentido en el papel
+                  '@media print': {
+                    '& [data-field="acciones"]': { display: 'none' },
+                  },
                 }}
               />
             </Box>
           </Box>
         </Paper>
       </Box>
+
+      <Dialog
+        open={!!salidaAEliminar}
+        onClose={() => !eliminarSalida.isLoading && setSalidaAEliminar(null)}
+      >
+        <DialogTitle>¿Eliminar esta salida?</DialogTitle>
+        <DialogContent>
+          <DialogContentText component='div'>
+            Se va a eliminar la salida de{' '}
+            <strong>{salidaAEliminar?.territorio}</strong> del{' '}
+            <strong>
+              {salidaAEliminar?.fecha
+                ? dayjs(salidaAEliminar.fecha).format('DD/MM/YYYY HH:mm')
+                : '-'}
+            </strong>
+            , informada por <strong>{salidaAEliminar?.conductor}</strong>.
+            <Box sx={{ mt: 2 }}>
+              Esta acción no se puede deshacer. Las direcciones de "No visitar"
+              que se hayan cargado en esa salida no se borran.
+            </Box>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setSalidaAEliminar(null)}
+            disabled={eliminarSalida.isLoading}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={confirmarEliminacion}
+            variant='contained'
+            color='error'
+            disabled={eliminarSalida.isLoading}
+            startIcon={
+              eliminarSalida.isLoading ? (
+                <CircularProgress size={18} color='inherit' />
+              ) : (
+                <DeleteIcon />
+              )
+            }
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
