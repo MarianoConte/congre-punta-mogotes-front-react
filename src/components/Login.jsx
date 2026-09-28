@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -13,7 +14,7 @@ import { useAuthContext } from '../context/AuthContext';
 import useMessages from '../hooks/useMessages';
 
 export default function Login() {
-  const { login } = useAuthContext();
+  const { login, sesionExpirada } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
   const { showError } = useMessages();
@@ -57,6 +58,11 @@ export default function Login() {
           <Typography variant='h6' sx={{ textAlign: 'center', mb: 3 }}>
             Iniciar sesión
           </Typography>
+          {sesionExpirada && (
+            <Alert severity='warning' sx={{ mb: 3 }}>
+              Tu sesión expiró. Iniciá sesión nuevamente.
+            </Alert>
+          )}
           <form onSubmit={handleSubmit}>
             <TextField
               label='Email o usuario'

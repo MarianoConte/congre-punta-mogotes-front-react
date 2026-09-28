@@ -11,6 +11,7 @@ export default function useTerritorio(id) {
     ['territorio', id],
     () => getTerritorio(id),
     {
+      enabled: !!id,
       refetchOnWindowFocus: false,
       select: (data) => data.data,
     }
