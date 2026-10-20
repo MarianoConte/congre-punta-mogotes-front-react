@@ -1,9 +1,8 @@
 import { useQuery } from 'react-query';
-import clienteAxios from '../../config/clienteAxios';
+import { traerTodo } from '../../config/clienteAxios';
 
 const getTerritorios = async () => {
-  const { data } = await clienteAxios('/territorios?populate=*&pagination[pageSize]=100');
-  return data;
+  return traerTodo('/territorios?populate=*');
 };
 
 export default function useTerritorios() {

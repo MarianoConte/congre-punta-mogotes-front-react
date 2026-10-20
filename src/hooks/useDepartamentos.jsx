@@ -1,11 +1,10 @@
 import { useQuery } from 'react-query';
-import clienteAxios from '../../config/clienteAxios';
+import { traerTodo } from '../../config/clienteAxios';
 
 const getDepartamentos = async (id) => {
-  const { data } = await clienteAxios.get(
-    `/departamentos?filters[edificio][id][$eq]=${id}&pagination[pageSize]=200&sort=UltimaVisita:asc`
+  return traerTodo(
+    `/departamentos?filters[edificio][id][$eq]=${id}&sort=UltimaVisita:asc`
   );
-  return data;
 };
 
 export default function useDepartamentos(id) {

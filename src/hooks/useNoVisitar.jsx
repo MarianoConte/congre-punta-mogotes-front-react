@@ -1,11 +1,10 @@
 import { useQuery } from 'react-query';
-import clienteAxios from '../../config/clienteAxios';
+import { traerTodo } from '../../config/clienteAxios';
 
 const getNoVisitar = async (territorioId) => {
-  const { data } = await clienteAxios.get(
-    `/no-visitars?filters[territorio][id][$eq]=${territorioId}&pagination[pageSize]=1000`
+  return traerTodo(
+    `/no-visitars?filters[territorio][id][$eq]=${territorioId}`
   );
-  return data;
 };
 
 export default function useNoVisitar(territorioId) {

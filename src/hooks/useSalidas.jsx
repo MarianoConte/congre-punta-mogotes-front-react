@@ -1,13 +1,11 @@
 import { useQuery } from 'react-query';
-import clienteAxios from '../../config/clienteAxios';
+import { traerTodo } from '../../config/clienteAxios';
 
 const getSalidas = async ({ startDate, endDate } = {}) => {
-  let url =
-    '/salidas?populate[territorio][populate]=Foto&sort=Fecha:desc&pagination[pageSize]=1000';
+  let url = '/salidas?populate[territorio][populate]=Foto&sort=Fecha:desc';
   if (startDate) url += `&filters[Fecha][$gte]=${startDate}`;
   if (endDate) url += `&filters[Fecha][$lte]=${endDate}`;
-  const { data } = await clienteAxios.get(url);
-  return data;
+  return traerTodo(url);
 };
 
 export default function useSalidas(filters = {}) {
