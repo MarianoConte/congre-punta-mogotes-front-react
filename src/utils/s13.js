@@ -7,8 +7,9 @@ export function formatearFecha(fecha) {
   return fecha ? dayjs(fecha).format('DD/MM/YYYY') : '';
 }
 
-export function nombreArchivoS13(numero, anio, extension) {
-  return `S-13_Territorio-${numero}_${anio}.${extension}`;
+export function nombreArchivoS13(datos, extension) {
+  const quien = datos.territorios ? 'Todos-los-territorios' : `Territorio-${datos.numero}`;
+  return `S-13_${quien}_${datos.anioServicio}.${extension}`;
 }
 
 // Arma los datos de la planilla S-13-S para un territorio y un año de servicio.
@@ -55,4 +56,51 @@ export function generarDatosS13({ numero, manzanas, salidas, anioServicio }) {
     asignaciones,
     filas,
   };
+}
+
+// El S-13 completo: un territorio debajo del otro, ordenados por número. Los que no tienen
+// manzanas salen con una línea en blanco para completar a mano.
+export function generarDatosS13Todos({ territorios, anioServicio }) {
+  const ordenados = [...territorios].sort((a, b) => Number(a.numero) - Number(b.numero));
+  return {
+    anioServicio,
+    territorios: ordenados.map((t) => generarDatosS13({ ...t, anioServicio })),
+  };
+}
+
+function cabeceraDe(datos) {
+  return {
+    numero: String(datos.numero),
+    ultimaFecha: formatearFecha(datos.ultimaFechaCompletado),
+  };
+}
+
+// Las líneas de la planilla, agrupadas por territorio. El número y la última fecha van solo
+// en la primera línea de cada territorio; las que siguen son la continuación de sus bloques.
+export function lineasS13(datos) {
+  return (datos.territorios ?? [datos]).map((t) =>
+    t.filas.map((bloques, i) => ({ bloques, cabecera: i === 0 ? cabeceraDe(t) : null }))
+  );
+}
+
+// Reparte las líneas en hojas. Un territorio que no entra en lo que queda de la hoja pasa entero
+// a la siguiente; si no entra ni en una hoja sola, al cortarse repite su cabecera arriba.
+export function paginarS13(datos, filasPorPagina) {
+  const paginas = [[]];
+  lineasS13(datos).forEach((lineas, indice) => {
+    let pagina = paginas[paginas.length - 1];
+    if (pagina.length > 0 && pagina.length + lineas.length > filasPorPagina) {
+      pagina = [];
+      paginas.push(pagina);
+    }
+    const cabecera = cabeceraDe((datos.territorios ?? [datos])[indice]);
+    lineas.forEach((linea) => {
+      if (pagina.length === filasPorPagina) {
+        pagina = [];
+        paginas.push(pagina);
+      }
+      pagina.push(pagina.length === 0 ? { ...linea, cabecera } : linea);
+    });
+  });
+  return paginas;
 }

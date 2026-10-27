@@ -1,5 +1,5 @@
 import { descargarBlob } from './descargar';
-import { formatearFecha, nombreArchivoS13 } from './s13';
+import { formatearFecha, lineasS13, nombreArchivoS13 } from './s13';
 
 const TITULO = 'REGISTRO DE ASIGNACIÓN DE TERRITORIO';
 const NOTA_AL_PIE =
@@ -67,17 +67,15 @@ export function construirLibroS13(ExcelJS, datos) {
 
   // Cuerpo: cada fila de la planilla ocupa dos filas de hoja
   let fila = 6;
-  datos.filas.forEach((bloques, indice) => {
+  lineasS13(datos).flat().forEach(({ bloques, cabecera }) => {
     const filaNombres = fila;
     const filaFechas = fila + 1;
 
     hoja.mergeCells(filaNombres, 1, filaFechas, 1);
     hoja.mergeCells(filaNombres, 2, filaFechas, 2);
-    if (indice === 0) {
-      hoja.getRow(filaNombres).getCell(1).value = datos.numero;
-      hoja.getRow(filaNombres).getCell(2).value = formatearFecha(
-        datos.ultimaFechaCompletado
-      );
+    if (cabecera) {
+      hoja.getRow(filaNombres).getCell(1).value = cabecera.numero;
+      hoja.getRow(filaNombres).getCell(2).value = cabecera.ultimaFecha;
     }
 
     bloques.forEach((bloque, i) => {
@@ -117,6 +115,6 @@ export async function exportarS13Xlsx(datos) {
   const buffer = await libro.xlsx.writeBuffer();
   descargarBlob(
     new Blob([buffer], { type: MIME_XLSX }),
-    nombreArchivoS13(datos.numero, datos.anioServicio, 'xlsx')
+    nombreArchivoS13(datos, 'xlsx')
   );
 }

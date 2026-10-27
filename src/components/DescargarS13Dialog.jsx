@@ -18,7 +18,7 @@ import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import useMessages from '../hooks/useMessages';
 import { getAnioDeServicio, rangoAnioServicio } from '../utils/ciclos';
-import { generarDatosS13 } from '../utils/s13';
+import { generarDatosS13, generarDatosS13Todos } from '../utils/s13';
 
 function aniosDisponibles(salidas) {
   const anios = new Set(
@@ -29,35 +29,42 @@ function aniosDisponibles(salidas) {
   return [...anios].sort((a, b) => b - a);
 }
 
-export default function DescargarS13Dialog({ open, onClose, formato, territorio }) {
+// Con `territorio` arma el S-13 de ese territorio; con `territorios`, el S-13 completo.
+export default function DescargarS13Dialog({ open, onClose, formato, territorio, territorios }) {
   const { showSuccess, showError } = useMessages();
   const [anio, setAnio] = useState(null);
   const [descargando, setDescargando] = useState(false);
 
-  const anios = useMemo(
-    () => aniosDisponibles(territorio?.salidas),
-    [territorio]
+  const lista = useMemo(
+    () => territorios ?? (territorio ? [territorio] : null),
+    [territorio, territorios]
   );
+  const salidas = useMemo(() => lista?.flatMap((t) => t.salidas ?? []), [lista]);
+  const anios = useMemo(() => aniosDisponibles(salidas), [salidas]);
 
   useEffect(() => {
-    if (territorio) setAnio(aniosDisponibles(territorio.salidas)[0]);
-  }, [territorio]);
+    if (salidas) setAnio(aniosDisponibles(salidas)[0]);
+  }, [salidas]);
 
-  if (!territorio) return null;
+  if (!lista) return null;
 
   const esPdf = formato === 'pdf';
-  const sinManzanas = !territorio.manzanas || territorio.manzanas.length === 0;
+  const sinManzanas = lista
+    .filter((t) => !t.manzanas || t.manzanas.length === 0)
+    .map((t) => t.numero);
   const { desde, hasta } = rangoAnioServicio(anio ?? anios[0]);
 
   const handleDescargar = async () => {
     setDescargando(true);
     try {
-      const datos = generarDatosS13({
-        numero: territorio.numero,
-        manzanas: territorio.manzanas,
-        salidas: territorio.salidas,
-        anioServicio: anio,
-      });
+      const datos = territorios
+        ? generarDatosS13Todos({ territorios, anioServicio: anio })
+        : generarDatosS13({
+            numero: territorio.numero,
+            manzanas: territorio.manzanas,
+            salidas: territorio.salidas,
+            anioServicio: anio,
+          });
 
       if (esPdf) {
         const { exportarS13Pdf } = await import('../utils/exportS13Pdf');
@@ -80,7 +87,7 @@ export default function DescargarS13Dialog({ open, onClose, formato, territorio 
   return (
     <Dialog open={open} onClose={descargando ? undefined : onClose} maxWidth='xs' fullWidth>
       <DialogTitle sx={{ fontWeight: 'bold', color: '#426B69' }}>
-        Descargar S-13 — Territorio {territorio.numero}
+        Descargar S-13 — {territorios ? 'Todos los territorios' : `Territorio ${territorio.numero}`}
       </DialogTitle>
 
       <DialogContent>
@@ -108,10 +115,11 @@ export default function DescargarS13Dialog({ open, onClose, formato, territorio 
           Del {desde.format('DD/MM/YYYY')} al {hasta.format('DD/MM/YYYY')}
         </Typography>
 
-        {sinManzanas && (
+        {sinManzanas.length > 0 && (
           <Alert severity='warning' sx={{ mt: 2 }}>
-            Este territorio no tiene manzanas configuradas, así que la planilla saldrá en
-            blanco para completar a mano.
+            {territorios
+              ? `Sin manzanas configuradas: ${sinManzanas.join(', ')}. Esas líneas saldrán en blanco para completar a mano.`
+              : 'Este territorio no tiene manzanas configuradas, así que la planilla saldrá en blanco para completar a mano.'}
           </Alert>
         )}
       </DialogContent>

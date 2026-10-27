@@ -1,4 +1,4 @@
-import { Box, Chip, Dialog, DialogContent, IconButton, LinearProgress, Paper, Typography } from '@mui/material';
+import { Box, Button, Chip, Dialog, DialogContent, IconButton, LinearProgress, Paper, Typography } from '@mui/material';
 import { DataGrid, esES } from '@mui/x-data-grid';
 import CloseIcon from '@mui/icons-material/Close';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
@@ -202,9 +202,40 @@ export default function TableroDeServicio() {
           <Box sx={{ height: 10, backgroundColor: '#8BB174', borderRadius: '8px 8px 0 0' }} />
 
           <Box sx={{ p: 3 }}>
-            <Typography variant='h5' sx={{ fontWeight: 'bold', color: '#426B69', mb: 2 }}>
-              Tablero de Servicio
-            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1,
+                mb: 2,
+              }}
+            >
+              <Typography variant='h5' sx={{ fontWeight: 'bold', color: '#426B69' }}>
+                Tablero de Servicio
+              </Typography>
+
+              {/* La planilla S-13 con todos los territorios, uno por línea */}
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant='contained'
+                  startIcon={<PictureAsPdfIcon />}
+                  onClick={() => setDescarga({ formato: 'pdf', todos: true })}
+                  sx={{ backgroundColor: '#C62828', '&:hover': { backgroundColor: '#8E1C1C' } }}
+                >
+                  S-13 completo
+                </Button>
+                <Button
+                  variant='contained'
+                  startIcon={<GridOnIcon />}
+                  onClick={() => setDescarga({ formato: 'xlsx', todos: true })}
+                  sx={{ backgroundColor: '#1D6F42', '&:hover': { backgroundColor: '#14502F' } }}
+                >
+                  S-13 completo
+                </Button>
+              </Box>
+            </Box>
 
             <DataGrid
               rows={rows}
@@ -260,8 +291,9 @@ export default function TableroDeServicio() {
       <DescargarS13Dialog
         open={!!descarga}
         formato={descarga?.formato}
+        territorios={descarga?.todos ? rows : undefined}
         territorio={
-          descarga
+          descarga?.row
             ? {
                 numero: descarga.row.numero,
                 manzanas: descarga.row.manzanas,

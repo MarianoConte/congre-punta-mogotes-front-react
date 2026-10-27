@@ -1,6 +1,6 @@
 import plantillaUrl from '../assets/s13-plantilla.pdf?url';
 import { descargarBlob } from './descargar';
-import { formatearFecha, nombreArchivoS13 } from './s13';
+import { formatearFecha, nombreArchivoS13, paginarS13 } from './s13';
 
 // El PDF se genera escribiendo sobre el formulario oficial S-13-S, así que la planilla
 // sale idéntica al original. Las coordenadas de abajo están medidas sobre su grilla
@@ -95,8 +95,8 @@ export async function construirPdfS13(PDFDocument, StandardFonts, plantillaBytes
   const fuente = await doc.embedFont(StandardFonts.Helvetica);
 
   // Una hoja de la plantilla entra 20 filas; si hicieran falta más, se agregan hojas.
-  const paginasNecesarias = Math.max(1, Math.ceil(datos.filas.length / FILAS_POR_PAGINA));
-  for (let i = 1; i < paginasNecesarias; i += 1) {
+  const paginas = paginarS13(datos, FILAS_POR_PAGINA);
+  for (let i = 1; i < paginas.length; i += 1) {
     const [copia] = await doc.copyPages(doc, [0]);
     doc.addPage(copia);
   }
@@ -110,18 +110,11 @@ export async function construirPdfS13(PDFDocument, StandardFonts, plantillaBytes
     });
   });
 
-  datos.filas.forEach((bloques, indice) => {
-    const pagina = doc.getPage(Math.floor(indice / FILAS_POR_PAGINA));
-    const indiceEnPagina = indice % FILAS_POR_PAGINA;
-    // El número y la última fecha se escriben una sola vez por hoja, en su primera fila.
-    const cabecera =
-      indiceEnPagina === 0
-        ? {
-            numero: String(datos.numero),
-            ultimaFecha: formatearFecha(datos.ultimaFechaCompletado),
-          }
-        : null;
-    escribirFila(pagina, fuente, indiceEnPagina, bloques, cabecera);
+  paginas.forEach((lineas, numeroDePagina) => {
+    const pagina = doc.getPage(numeroDePagina);
+    lineas.forEach(({ bloques, cabecera }, indiceEnPagina) => {
+      escribirFila(pagina, fuente, indiceEnPagina, bloques, cabecera);
+    });
   });
 
   return doc.save();
@@ -136,6 +129,6 @@ export async function exportarS13Pdf(datos) {
   const bytes = await construirPdfS13(PDFDocument, StandardFonts, plantilla, datos);
   descargarBlob(
     new Blob([bytes], { type: 'application/pdf' }),
-    nombreArchivoS13(datos.numero, datos.anioServicio, 'pdf')
+    nombreArchivoS13(datos, 'pdf')
   );
 }
